@@ -3,6 +3,7 @@ import {
   getRepoContent,
   getRepoTreeRecursive,
   getRepoZipball,
+  getGitHubGrass,
 } from "../services/github.service.js";
 import { sendZipResponse } from "../utils/buffer.util.js";
 
@@ -18,6 +19,18 @@ export const handleTestGithubUserData = (req, res) => {
   res.status(StatusCodes.OK).success({
     message: "GitHub User Data Only",
     user: req.user,
+  });
+};
+
+export const handleGetGitHubGrass = async (req, res) => {
+  const user = req.user;
+
+  const grassData = await getGitHubGrass(req.accessToken, user.login);
+
+  return res.status(StatusCodes.OK).success({
+    message: "GitHub Grass (Contributions) Data",
+    userName: user.login,
+    grass: grassData,
   });
 };
 

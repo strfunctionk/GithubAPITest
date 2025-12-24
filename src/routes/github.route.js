@@ -10,6 +10,7 @@ import {
   handleDownloadRepoZip,
   handleGetRepoTree,
   handleGetRepoContent,
+  handleGetGitHubGrass,
 } from "../controllers/github.controller.js";
 const route = express.Router();
 
@@ -27,6 +28,8 @@ route.get(
   githubUserData,
   handleTestGithubUserData
 );
+
+route.get("/test/grass", getAccessToken, githubUserData, handleGetGitHubGrass);
 
 route.get(
   "/test/content",

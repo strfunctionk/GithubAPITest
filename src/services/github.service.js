@@ -58,3 +58,30 @@ export const getRepoZipball = async (
   );
   return zipballData;
 };
+
+export const getGitHubGrass = async (accessToken, userName) => {
+  const query = `
+    query($login:String!) {
+      user(login:$login) {
+        contributionsCollection {
+          contributionCalendar {
+            weeks {
+              contributionDays {
+                date
+                contributionCount
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  const grass = await githubClient("/graphql", accessToken, {
+    method: "POST",
+    data: {
+      query,
+      variables: { login: userName },
+    },
+  });
+  return grass;
+};
