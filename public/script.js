@@ -27,6 +27,10 @@ window.addEventListener("message", (event) => {
   }
 });
 
+document.getElementById('testGrassBtn').addEventListener('click', () => {
+    fetchGitHubData('/v1/api/github/test/grass');
+});
+
 document.getElementById("testContentBtn").addEventListener("click", () => {
   fetchGitHubData("/v1/api/github/test/content");
 });
@@ -104,58 +108,119 @@ document
     }
   });
 
+// 잔디 렌더링 함수
+function renderGrass(data) {
+    const resultArea = document.getElementById('resultArea');
+    
+    // 데이터 구조 안전하게 탐색
+    const weeks = data?.success?.grass?.data?.user?.contributionsCollection?.contributionCalendar?.weeks;
+    
+    if (!weeks || !Array.isArray(weeks)) {
+        console.warn("잔디 데이터를 찾을 수 없습니다.");
+        return;
+    }
+
+    const container = document.createElement('div');
+    container.className = 'graph-container';
+    container.innerHTML = '<h4>Contribution Graph</h4>';
+    
+    const grid = document.createElement('div');
+    grid.style.display = 'flex';
+    
+    weeks.forEach(week => {
+        const weekDiv = document.createElement('div');
+        weekDiv.className = 'week';
+        
+        week.contributionDays.forEach(day => {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'day';
+            
+            // 기여도에 따른 레벨 설정 (단순화)
+            let level = 0;
+            if (day.contributionCount > 0) level = 1;
+            if (day.contributionCount > 3) level = 2;
+            if (day.contributionCount > 6) level = 3;
+            if (day.contributionCount > 10) level = 4;
+            
+            dayDiv.setAttribute('data-level', level);
+            dayDiv.setAttribute('title', `${day.date}: ${day.contributionCount} contributions`);
+            
+            // 툴팁 이벤트
+            dayDiv.addEventListener('mouseover', (e) => {
+                const tooltip = document.getElementById('tooltip');
+                tooltip.innerText = `${day.date}: ${day.contributionCount}`;
+                tooltip.style.display = 'block';
+                tooltip.style.left = e.pageX + 10 + 'px';
+                tooltip.style.top = e.pageY + 10 + 'px';
+            });
+            dayDiv.addEventListener('mouseout', () => {
+                document.getElementById('tooltip').style.display = 'none';
+            });
+
+            weekDiv.appendChild(dayDiv);
+        });
+        
+        grid.appendChild(weekDiv);
+    });
+    
+    container.appendChild(grid);
+    resultArea.prepend(container); // JSON 결과 위에 그래프 추가
+}
+
 // 공통 Fetch 함수
 async function fetchGitHubData(endpoint) {
-  const tokenInput = document.getElementById("tokenInput");
-  const token = tokenInput.value.trim();
-  const resultArea = document.getElementById("resultArea");
+    const tokenInput = document.getElementById('tokenInput');
+    const token = tokenInput.value.trim();
+    const resultArea = document.getElementById('resultArea');
 
-  if (!token) {
-    alert("Access Token을 입력해주세요.");
-    tokenInput.focus();
-    return;
-  }
+    if (!token) {
+        alert('Access Token을 입력해주세요.');
+        tokenInput.focus();
+        return;
+    }
 
-  resultArea.innerHTML = "<p>데이터를 불러오는 중...</p>";
+    resultArea.innerHTML = '<p>데이터를 불러오는 중...</p>';
 
-  try {
-    const response = await fetch(endpoint, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const responseText = await response.text();
-    console.log(`Raw Response (${endpoint}):`, responseText);
-
-    let data;
     try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      // HTML 에러 페이지 등 JSON이 아닌 경우
-      throw new Error(
-        `Invalid JSON response:\n${responseText.substring(0, 500)}...`
-      );
-    }
+        const response = await fetch(endpoint, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const responseText = await response.text();
+        console.log(`Raw Response (${endpoint}):`, responseText);
 
-    if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`);
-    }
-
-    resultArea.innerHTML = `
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            throw new Error(`Invalid JSON response:\n${responseText.substring(0, 500)}...`);
+        }
+        
+        if (!response.ok) {
+            throw new Error(data.error?.reason || data.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        resultArea.innerHTML = `
             <h3>Result (Status: ${response.status})</h3>
             <p><strong>Endpoint:</strong> ${endpoint}</p>
             <pre>${JSON.stringify(data, null, 2)}</pre>
         `;
-  } catch (error) {
-    console.error("Error:", error);
-    resultArea.innerHTML = `
+
+        if (endpoint.includes('/test/grass')) {
+            renderGrass(data);
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        resultArea.innerHTML = `
             <div style="color: #cb2431; background: #ffeef0; padding: 1rem; border-radius: 6px; border: 1px solid #f5c6cb;">
                 <strong>오류 발생:</strong> ${error.message}<br><br>
                 토큰이 올바른지 확인하거나, 콘솔 로그(Raw Response)를 확인해보세요.
             </div>
         `;
-  }
+    }
 }
 
 document.getElementById("testUserBtn").addEventListener("click", () => {

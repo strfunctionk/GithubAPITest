@@ -61,17 +61,25 @@
         font-family: monospace;
         color: #d73a49;
       }
-      .note {
-        background-color: #fffbdd;
-        border-left: 4px solid #ffeb3b;
-        padding: 1rem;
-        margin-top: 1rem;
-        font-size: 0.9rem;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>DeVine GitHub Integration Test</h1>
+              .note { background-color: #fffbdd; border-left: 4px solid #ffeb3b; padding: 1rem; margin-top: 1rem; font-size: 0.9rem; }
+              
+              /* 잔디 그래프 스타일 */
+              .graph-container { display: flex; overflow-x: auto; padding: 10px; background: #fff; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 1rem; }
+              .week { display: flex; flex-direction: column; gap: 3px; margin-right: 3px; }
+              .day { width: 10px; height: 10px; border-radius: 2px; background-color: #ebedf0; }
+              /* 기여도 색상 단계 (GitHub 스타일) */
+              .day[data-level="0"] { background-color: #ebedf0; }
+              .day[data-level="1"] { background-color: #9be9a8; }
+              .day[data-level="2"] { background-color: #40c463; }
+              .day[data-level="3"] { background-color: #30a14e; }
+              .day[data-level="4"] { background-color: #216e39; }
+              
+              .tooltip { position: absolute; background: rgba(0,0,0,0.8); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 12px; pointer-events: none; display: none; z-index: 100; }
+          </style>
+      </head>
+      <body>
+          <div id="tooltip" class="tooltip"></div>
+          <h1>DeVine GitHub Integration Test</h1>
 
     <div class="card">
       <h2>Step 1: Access Token 발급</h2>
@@ -110,23 +118,14 @@
         />
       </div>
 
-      <div style="display: flex; gap: 10px; flex-wrap: wrap">
-        <button id="testUserBtn" class="btn" style="background: #0366d6">
-          Test User Data Only
-        </button>
-        <button id="testBtn" class="btn btn-test">
-          Test Full Data (User + Repos)
-        </button>
-        <button id="testContentBtn" class="btn" style="background: #008080">
-          Get Repo Content (Root)
-        </button>
-        <button id="testTreeBtn" class="btn" style="background: #6f42c1">
-          Get Repo Tree
-        </button>
-        <button id="downloadZipBtn" class="btn" style="background: #f66a0a">
-          Download Repo Zip
-        </button>
-      </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="testUserBtn" class="btn" style="background: #0366d6;">Test User Data Only</button>
+            <button id="testBtn" class="btn btn-test">Test Full Data (User + Repos)</button>
+            <button id="testGrassBtn" class="btn" style="background: #2ea44f;">Get GitHub Grass</button>
+            <button id="testContentBtn" class="btn" style="background: #008080;">Get Repo Content (Root)</button>
+            <button id="testTreeBtn" class="btn" style="background: #6f42c1;">Get Repo Tree</button>
+            <button id="downloadZipBtn" class="btn" style="background: #f66a0a;">Download Repo Zip</button>
+        </div>
 
       <div id="resultArea" style="margin-top: 1.5rem"></div>
     </div>
