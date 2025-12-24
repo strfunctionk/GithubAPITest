@@ -24,8 +24,9 @@ export const handleTestGithubUserData = (req, res) => {
 
 export const handleGetGitHubGrass = async (req, res) => {
   const user = req.user;
+  const { year } = req.query;
 
-  const grassData = await getGitHubGrass(req.accessToken, user.login);
+  const grassData = await getGitHubGrass(req.accessToken, user.login, year);
 
   return res.status(StatusCodes.OK).success({
     message: "GitHub Grass (Contributions) Data",

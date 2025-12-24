@@ -59,11 +59,24 @@ export const getRepoZipball = async (
   return zipballData;
 };
 
-export const getGitHubGrass = async (accessToken, userName) => {
+export const getGitHubGrass = async (accessToken, userName, year) => {
+  let queryVariables = { login: userName };
+  let queryArgs = "$login:String!";
+  let collectionArgs = "";
+
+  if (year) {
+    const from = `${year}-01-01T00:00:00Z`;
+    const to = `${year}-12-31T23:59:59Z`;
+    queryVariables.from = from;
+    queryVariables.to = to;
+    queryArgs += ", $from:DateTime, $to:DateTime";
+    collectionArgs = "(from: $from, to: $to)";
+  }
+
   const query = `
-    query($login:String!) {
+    query(${queryArgs}) {
       user(login:$login) {
-        contributionsCollection {
+        contributionsCollection${collectionArgs} {
           contributionCalendar {
             weeks {
               contributionDays {
@@ -80,7 +93,7 @@ export const getGitHubGrass = async (accessToken, userName) => {
     method: "POST",
     data: {
       query,
-      variables: { login: userName },
+      variables: queryVariables,
     },
   });
   return grass;
