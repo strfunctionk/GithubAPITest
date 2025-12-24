@@ -27,8 +27,28 @@ window.addEventListener("message", (event) => {
   }
 });
 
+let currentYear = new Date().getFullYear();
+
+function updateYearDisplay() {
+    document.getElementById('currentYearDisplay').innerText = `${currentYear}년`;
+}
+
+// 초기화 시 현재 연도 표시
+updateYearDisplay();
+
+document.getElementById('prevYear').addEventListener('click', () => {
+    currentYear--;
+    updateYearDisplay();
+});
+
+document.getElementById('nextYear').addEventListener('click', () => {
+    currentYear++;
+    updateYearDisplay();
+});
+
 document.getElementById('testGrassBtn').addEventListener('click', () => {
-    fetchGitHubData('/v1/api/github/test/grass');
+    const endpoint = `/v1/api/github/test/grass?year=${currentYear}`;
+    fetchGitHubData(endpoint);
 });
 
 document.getElementById("testContentBtn").addEventListener("click", () => {
@@ -122,10 +142,20 @@ function renderGrass(data) {
 
     const container = document.createElement('div');
     container.className = 'graph-container';
-    container.innerHTML = '<h4>Contribution Graph</h4>';
     
-    const grid = document.createElement('div');
-    grid.style.display = 'flex';
+    // 월 표시 헤더
+    const monthsHeader = document.createElement('div');
+    monthsHeader.className = 'months-header';
+    const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+    monthNames.forEach(m => {
+        const span = document.createElement('span');
+        span.innerText = m;
+        monthsHeader.appendChild(span);
+    });
+    container.appendChild(monthsHeader);
+    
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'weeks-container';
     
     weeks.forEach(week => {
         const weekDiv = document.createElement('div');
@@ -135,11 +165,11 @@ function renderGrass(data) {
             const dayDiv = document.createElement('div');
             dayDiv.className = 'day';
             
-            // 기여도에 따른 레벨 설정 (단순화)
+            // 기여도에 따른 레벨 설정 (GitHub 기준에 가깝게 조정)
             let level = 0;
             if (day.contributionCount > 0) level = 1;
-            if (day.contributionCount > 3) level = 2;
-            if (day.contributionCount > 6) level = 3;
+            if (day.contributionCount > 2) level = 2;
+            if (day.contributionCount > 5) level = 3;
             if (day.contributionCount > 10) level = 4;
             
             dayDiv.setAttribute('data-level', level);
@@ -160,10 +190,17 @@ function renderGrass(data) {
             weekDiv.appendChild(dayDiv);
         });
         
-        grid.appendChild(weekDiv);
+        gridContainer.appendChild(weekDiv);
     });
     
-    container.appendChild(grid);
+    container.appendChild(gridContainer);
+    
+    // 기존에 렌더링된 그래프가 있으면 제거
+    const existingGraph = resultArea.querySelector('.graph-container');
+    if (existingGraph) {
+        existingGraph.remove();
+    }
+    
     resultArea.prepend(container); // JSON 결과 위에 그래프 추가
 }
 

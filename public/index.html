@@ -64,9 +64,18 @@
               .note { background-color: #fffbdd; border-left: 4px solid #ffeb3b; padding: 1rem; margin-top: 1rem; font-size: 0.9rem; }
               
               /* 잔디 그래프 스타일 */
-              .graph-container { display: flex; overflow-x: auto; padding: 10px; background: #fff; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 1rem; }
+              .graph-container { display: flex; flex-direction: column; padding: 20px; background: #f8faff; border: 1px solid #e1e4e8; border-radius: 12px; margin-top: 1rem; }
+              .months-header { display: flex; margin-left: 0px; margin-bottom: 5px; font-size: 12px; color: #999; justify-content: space-between; padding-right: 10px; }
+              .weeks-container { display: flex; overflow-x: auto; }
               .week { display: flex; flex-direction: column; gap: 3px; margin-right: 3px; }
-              .day { width: 10px; height: 10px; border-radius: 2px; background-color: #ebedf0; }
+              .day { width: 12px; height: 12px; border-radius: 2px; background-color: #ebedf0; }
+              
+              /* 연도 네비게이션 스타일 */
+              .year-nav-container { display: flex; align-items: center; background: #f1f3f8; padding: 5px 15px; border-radius: 30px; }
+              .year-nav { display: flex; align-items: center; gap: 15px; font-weight: bold; font-size: 1.1rem; }
+              .nav-btn { background: #dfe4ec; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; font-weight: bold; }
+              .nav-btn:hover { background: #cfd6e0; }
+              
               /* 기여도 색상 단계 (GitHub 스타일) */
               .day[data-level="0"] { background-color: #ebedf0; }
               .day[data-level="1"] { background-color: #9be9a8; }
@@ -118,13 +127,31 @@
         />
       </div>
 
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button id="testUserBtn" class="btn" style="background: #0366d6;">Test User Data Only</button>
-            <button id="testBtn" class="btn btn-test">Test Full Data (User + Repos)</button>
-            <button id="testGrassBtn" class="btn" style="background: #2ea44f;">Get GitHub Grass</button>
-            <button id="testContentBtn" class="btn" style="background: #008080;">Get Repo Content (Root)</button>
-            <button id="testTreeBtn" class="btn" style="background: #6f42c1;">Get Repo Tree</button>
-            <button id="downloadZipBtn" class="btn" style="background: #f66a0a;">Download Repo Zip</button>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <!-- Group 1: Test Buttons -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="testUserBtn" class="btn" style="background: #0366d6;">Test User Data Only</button>
+                <button id="testBtn" class="btn btn-test">Test Full Data (User + Repos)</button>
+            </div>
+
+            <!-- Group 2: Repo Content Buttons -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="testContentBtn" class="btn" style="background: #008080;">Get Repo Content (Root)</button>
+                <button id="testTreeBtn" class="btn" style="background: #6f42c1;">Get Repo Tree</button>
+                <button id="downloadZipBtn" class="btn" style="background: #f66a0a;">Download Repo Zip</button>
+            </div>
+            
+            <!-- Group 3: GitHub Grass -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div class="year-nav-container">
+                    <div class="year-nav">
+                        <button id="prevYear" class="nav-btn">&lt;</button>
+                        <span id="currentYearDisplay">2025년</span>
+                        <button id="nextYear" class="nav-btn">&gt;</button>
+                    </div>
+                </div>
+                <button id="testGrassBtn" class="btn" style="background: #2ea44f;">Get GitHub Grass</button>
+            </div>
         </div>
 
       <div id="resultArea" style="margin-top: 1.5rem"></div>
