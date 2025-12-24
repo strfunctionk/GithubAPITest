@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DeVine GitHub OAuth Test</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+        color: #333;
+        line-height: 1.6;
+      }
+      h1 {
+        border-bottom: 2px solid #eee;
+        padding-bottom: 0.5rem;
+      }
+      .card {
+        border: 1px solid #ddd;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      .btn {
+        cursor: pointer;
+        padding: 0.6rem 1.2rem;
+        background: #24292e;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn:hover {
+        background: #444;
+      }
+      .btn-test {
+        background: #2ea44f;
+      }
+      .btn-test:hover {
+        background: #2c974b;
+      }
+      pre {
+        background: #f6f8fa;
+        padding: 1rem;
+        overflow-x: auto;
+        border-radius: 6px;
+        border: 1px solid #e1e4e8;
+        font-size: 0.9rem;
+      }
+      code {
+        background: #f0f0f0;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-family: monospace;
+        color: #d73a49;
+      }
+      .note {
+        background-color: #fffbdd;
+        border-left: 4px solid #ffeb3b;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>DeVine GitHub Integration Test</h1>
+
+    <div class="card">
+      <h2>Step 1: Access Token 발급</h2>
+      <p>GitHub 로그인을 통해 Access Token을 발급받습니다.</p>
+      <button id="loginBtn" class="btn">Login with GitHub</button>
+
+      <div class="note">
+        <strong>✨ 자동 처리:</strong><br />
+        위 버튼을 누르고 로그인을 완료하면, 팝업이 닫히면서
+        <strong>Access Token이 자동으로 입력</strong>됩니다.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Step 2: 데이터 조회 테스트</h2>
+      <p>발급받은 토큰을 입력하고 테스트를 진행합니다.</p>
+
+      <div style="margin-bottom: 1rem">
+        <label
+          for="tokenInput"
+          style="display: block; margin-bottom: 0.5rem; font-weight: bold"
+          >Access Token:</label
+        >
+        <input
+          type="text"
+          id="tokenInput"
+          placeholder="여기에 토큰을 붙여넣으세요 (gho_...)"
+          style="
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+          "
+        />
+      </div>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <button id="testUserBtn" class="btn" style="background: #0366d6">
+          Test User Data Only
+        </button>
+        <button id="testBtn" class="btn btn-test">
+          Test Full Data (User + Repos)
+        </button>
+        <button id="testContentBtn" class="btn" style="background: #008080">
+          Get Repo Content (Root)
+        </button>
+        <button id="testTreeBtn" class="btn" style="background: #6f42c1">
+          Get Repo Tree
+        </button>
+        <button id="downloadZipBtn" class="btn" style="background: #f66a0a">
+          Download Repo Zip
+        </button>
+      </div>
+
+      <div id="resultArea" style="margin-top: 1.5rem"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
