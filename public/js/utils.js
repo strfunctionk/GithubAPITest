@@ -31,13 +31,19 @@ function createTrackingProxy(target, usedKeys, path) {
 
     return new Proxy(target, {
         get: function(obj, prop) {
-            // Symbol이나 내장 함수 접근 제외
+            // Symbol 접근 제외
             if (typeof prop === 'string') {
-                var currentPath = path ? path + '.' + prop : prop;
-                usedKeys.add(currentPath);
+                // 실제 데이터 키만 추적 (프로토타입 메서드, 내장 프로퍼티 제외)
+                // 배열의 경우 인덱스만, 객체의 경우 자신의 키만
+                var isDataKey = Object.prototype.hasOwnProperty.call(obj, prop);
                 
-                // 재귀적으로 Proxy 생성
-                return createTrackingProxy(obj[prop], usedKeys, currentPath);
+                if (isDataKey) {
+                    var currentPath = path ? path + '.' + prop : prop;
+                    usedKeys.add(currentPath);
+                    
+                    // 재귀적으로 Proxy 생성
+                    return createTrackingProxy(obj[prop], usedKeys, currentPath);
+                }
             }
             return Reflect.get(obj, prop);
         }
@@ -161,6 +167,81 @@ function renderJSON(data, usedKeys, path, level) {
     }
 }
 
+// Helper to get value by path string
+function getValueByPath(obj, path) {
+    return path.split('.').reduce(function(o, p) {
+        return (o && o[p] !== undefined) ? o[p] : undefined;
+    }, obj);
+}
+
+// Render Only Used Data
+function renderUsedData(data, usedKeys) {
+    if (usedKeys.size === 0) return 'No data accessed.';
+    
+    var html = '<table style="width:100%; border-collapse: collapse; font-size:12px;">';
+    html += '<tr style="background:#eee; text-align:left;"><th style="padding:8px;">Path (Key)</th><th style="padding:8px;">Value</th></tr>';
+    
+    var sortedKeys = Array.from(usedKeys).sort();
+    
+    sortedKeys.forEach(function(path) {
+        var value = getValueByPath(data, path);
+        var displayValue = JSON.stringify(value);
+        if (displayValue && displayValue.length > 100) displayValue = displayValue.substring(0, 100) + '...';
+        
+        html += '<tr style="border-bottom:1px solid #eee;">';
+        html += '<td style="padding:6px; color:#d73a49; font-family:monospace;">' + path + '</td>';
+        html += '<td style="padding:6px; color:#032f62; font-family:monospace;">' + displayValue + '</td>';
+        html += '</tr>';
+    });
+    
+    html += '</table>';
+    return html;
+}
+
+// Render Schema Mode (Collapsed Array + Types)
+function renderSchemaMode(data, usedKeys) {
+    if (usedKeys.size === 0) return 'No data accessed.';
+    
+    var schemaMap = new Map(); // Normalized Path -> Type String
+
+    usedKeys.forEach(function(path) {
+        var value = getValueByPath(data, path);
+        var type = Array.isArray(value) ? 'array' : (value === null ? 'null' : typeof value);
+        
+        // Normalize path: replace .0 .12 with []
+        // By replacing ".digits", we get "property[].nextProperty" or "property[]" (at end)
+        var normalizedPath = path.replace(/\.(\d+)/g, '[]');
+        
+        // Handle root array index access like "0.name" -> "[].name"
+        if (/^\d+(\.|$)/.test(normalizedPath)) {
+            normalizedPath = normalizedPath.replace(/^\d+/, '[]');
+        }
+
+        // Store type
+        if (!schemaMap.has(normalizedPath)) {
+            schemaMap.set(normalizedPath, new Set());
+        }
+        schemaMap.get(normalizedPath).add(type);
+    });
+    
+    var html = '<table style="width:100%; border-collapse: collapse; font-size:12px;">';
+    html += '<tr style="background:#eee; text-align:left;"><th style="padding:8px;">Normalized Path</th><th style="padding:8px;">Type</th></tr>';
+    
+    var sortedPaths = Array.from(schemaMap.keys()).sort();
+    
+    sortedPaths.forEach(function(path) {
+        var types = Array.from(schemaMap.get(path)).join(' | ');
+        
+        html += '<tr style="border-bottom:1px solid #eee;">';
+        html += '<td style="padding:6px; color:#6f42c1; font-family:monospace; font-weight:bold;">' + path + '</td>';
+        html += '<td style="padding:6px; color:#032f62; font-family:monospace;">' + types + '</td>';
+        html += '</tr>';
+    });
+    
+    html += '</table>';
+    return html;
+}
+
 // Debug Viewer Feature
 function initDebugViewer() {
     if (document.getElementById('debugBtn')) return;
@@ -176,7 +257,11 @@ function initDebugViewer() {
     modal.innerHTML = 
         '<div class="debug-content">' +
             '<div class="debug-header">' +
-                '<h3>API Usage Tracker (Highlighted = Used)</h3>' +
+                '<div>' +
+                    '<h3 style="margin:0; display:inline-block; margin-right:15px;">API Usage Tracker</h3>' +
+                    '<label style="margin-right:10px;"><input type="checkbox" id="showUsedOnly"> Show Used Values</label>' +
+                    '<label><input type="checkbox" id="showSchema"> Show Schema (Type)</label>' +
+                '</div>' +
                 '<button class="btn" id="closeDebug">Close</button>' +
             '</div>' +
             '<div class="debug-body" id="debugBody">' +
@@ -185,11 +270,24 @@ function initDebugViewer() {
         '</div>';
     document.body.appendChild(modal);
 
-    btn.addEventListener('click', function() {
-        modal.classList.add('active');
+    function updateDebugView() {
+        var showUsedOnly = document.getElementById('showUsedOnly').checked;
+        var showSchema = document.getElementById('showSchema').checked;
         var body = document.getElementById('debugBody');
         
+        // Checkbox interaction logic (Radio-like behavior or priority)
+        // Let's make Schema priority if both checked, or just respect state.
+        
         var historyHtml = window.apiHistory.slice().reverse().map(function(item) {
+            var content = '';
+            if (showSchema) {
+                content = renderSchemaMode(item.data, item.usedKeys);
+            } else if (showUsedOnly) {
+                content = renderUsedData(item.data, item.usedKeys);
+            } else {
+                content = '<pre style="white-space: pre-wrap; word-break: break-all;">' + renderJSON(item.data, item.usedKeys) + '</pre>';
+            }
+
             return '<div style="margin-bottom: 20px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">' +
                 '<div style="color: #0969da; font-weight: bold; margin-bottom: 5px;">' +
                     '[' + item.timestamp + '] ' + item.endpoint +
@@ -197,11 +295,26 @@ function initDebugViewer() {
                 '<div style="color: #666; font-size: 11px; margin-bottom: 5px;">' +
                     'Params: ' + JSON.stringify(item.params) +
                 '</div>' +
-                '<pre style="white-space: pre-wrap; word-break: break-all;">' + renderJSON(item.data, item.usedKeys) + '</pre>' +
+                content +
             '</div>';
         }).join('') || 'No data captured.';
 
         body.innerHTML = historyHtml;
+    }
+
+    btn.addEventListener('click', function() {
+        modal.classList.add('active');
+        updateDebugView();
+    });
+
+    document.getElementById('showUsedOnly').addEventListener('change', function(e) {
+        if(e.target.checked) document.getElementById('showSchema').checked = false;
+        updateDebugView();
+    });
+    
+    document.getElementById('showSchema').addEventListener('change', function(e) {
+        if(e.target.checked) document.getElementById('showUsedOnly').checked = false;
+        updateDebugView();
     });
 
     document.getElementById('closeDebug').addEventListener('click', function() {
