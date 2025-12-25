@@ -218,3 +218,18 @@ export const getCommitDetail = async (accessToken, owner, repo, commitSha) => {
   });
   return commitDetail;
 };
+
+/*
+  GitHub 저장소의 브랜치 목록을 가져옵니다.
+  @param {string} accessToken - GitHub 액세스 토큰
+  @param {string} owner - 저장소 소유자 이름
+  @param {string} repo - 저장소 이름
+  @returns {Promise<Array>} - 브랜치 객체 배열
+*/
+export const getRepoBranches = async (accessToken, owner, repo) => {
+  const url = `/repos/${owner}/${repo}/branches`;
+  const branches = await githubClient(url, accessToken, {
+    method: "GET",
+  });
+  return branches;
+};

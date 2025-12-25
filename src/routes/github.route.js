@@ -14,6 +14,7 @@ import {
   handleGetRepoCommits,
   handleGetRepoBlame,
   handleGetCommitDetail,
+  handleGetRepoBranches,
 } from "../controllers/github.controller.js";
 const route = express.Router();
 
@@ -64,6 +65,14 @@ route.get(
   githubUserData,
   githubUserRepos,
   handleGetRepoContent
+);
+
+route.get(
+  "/test/branches",
+  getAccessToken,
+  githubUserData,
+  githubUserRepos,
+  handleGetRepoBranches
 );
 
 route.get(

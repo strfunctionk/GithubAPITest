@@ -7,6 +7,7 @@ import {
   getRepoCommits,
   getRepoFileBlame,
   getCommitDetail,
+  getRepoBranches,
 } from "../services/github.service.js";
 import { sendZipResponse } from "../utils/buffer.util.js";
 import { getRepoContext } from "../utils/github.util.js";
@@ -65,14 +66,19 @@ export const handleGetCommitDetail = async (req, res) => {
   const { sha } = req.query;
 
   if (!sha)
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .error({ errorCode: "INVALID_REQUEST", reason: "SHA is required" });
+    return res.status(StatusCodes.BAD_REQUEST).error({
+      errorCode: "INVALID_REQUEST",
+      reason: "SHA is required",
+    });
 
   const detail = await getCommitDetail(req.accessToken, owner, repo, sha);
-  return res
-    .status(StatusCodes.OK)
-    .success({ message: "Commit Detail Data", owner, repo, sha, detail });
+  return res.status(StatusCodes.OK).success({
+    message: "Commit Detail Data",
+    owner,
+    repo,
+    sha,
+    detail,
+  });
 };
 
 export const handleGetRepoCommits = async (req, res) => {
@@ -85,9 +91,24 @@ export const handleGetRepoCommits = async (req, res) => {
     repo,
     author ? { author } : {}
   );
-  return res
-    .status(StatusCodes.OK)
-    .success({ message: "Repository Commits Data", owner, repo, commits });
+  return res.status(StatusCodes.OK).success({
+    message: "Repository Commits Data",
+    owner,
+    repo,
+    commits,
+  });
+};
+
+export const handleGetRepoBranches = async (req, res) => {
+  const { owner, repo } = getRepoContext(req);
+  const branches = await getRepoBranches(req.accessToken, owner, repo);
+
+  return res.status(StatusCodes.OK).success({
+    message: "Repository Branches Data",
+    owner,
+    repo,
+    branches,
+  });
 };
 
 export const handleGetRepoContent = async (req, res) => {
