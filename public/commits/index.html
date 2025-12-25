@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Commits · GitHub Clone</title>
+    <base href="/" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      .commit-group-title {
+        color: #57606a;
+        font-size: 14px;
+        margin: 16px 0 8px;
+        padding-left: 16px;
+        position: relative;
+      }
+      .commit-group-title::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 8px;
+        height: 8px;
+        background: #d0d7de;
+        border-radius: 50%;
+        transform: translateY(-50%);
+      }
+      .timeline-item {
+        display: flex;
+        padding: 8px 0;
+        border-left: 2px solid #e0e0e0;
+        margin-left: 3px;
+        padding-left: 20px;
+        position: relative;
+      }
+      .commit-box {
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        padding: 16px;
+        width: 100%;
+        background: white;
+      }
+      .commit-box:hover {
+        background-color: #f6f8fa;
+      }
+      .avatar-small {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 4px;
+      }
+      .sha-badge {
+        font-family: monospace;
+        background: #f6f8fa;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        padding: 2px 5px;
+        font-size: 12px;
+        color: #57606a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <a href="/home" class="header-logo">
+        <svg
+          height="32"
+          viewBox="0 0 16 16"
+          version="1.1"
+          width="32"
+          aria-hidden="true"
+          fill="white"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+          ></path>
+        </svg>
+        Commits
+      </a>
+      <div id="headerUser" class="header-user">Loading...</div>
+    </div>
+
+    <div class="container">
+      <div class="repo-header-title" style="margin-bottom: 24px">
+        <svg
+          height="24"
+          viewBox="0 0 16 16"
+          version="1.1"
+          width="24"
+          aria-hidden="true"
+          fill="#57606a"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"
+          ></path>
+        </svg>
+        <div id="breadcrumb" class="breadcrumb">Loading...</div>
+      </div>
+
+      <div style="margin-bottom: 20px">
+        <a id="codeTab" href="#" class="btn" style="margin-right: 8px">Code</a>
+        <a id="commitsTab" href="#" class="btn btn-primary">Commits</a>
+      </div>
+
+      <div id="loading" class="text-center">Loading commits...</div>
+      <div id="commitsContainer"></div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+      requireAuth();
+      renderHeader();
+
+      const params = new URLSearchParams(window.location.search);
+      const owner = params.get("owner");
+      const repo = params.get("repo");
+
+      const codeTab = document.getElementById("codeTab");
+      codeTab.href = `/repo?owner=${owner}&repo=${repo}`;
+      const commitsTab = document.getElementById("commitsTab");
+      commitsTab.href = `/commits?owner=${owner}&repo=${repo}`;
+
+      const renderBreadcrumb = () => {
+        const container = document.getElementById("breadcrumb");
+        let html = `<a href="/home" class="breadcrumb-segment">${owner}</a> <span class="breadcrumb-separator">/</span> `;
+        html += `<a href="/repo?owner=${owner}&repo=${repo}" class="breadcrumb-segment" style="font-weight:600;">${repo}</a>`;
+        container.innerHTML = html;
+      };
+
+      const fetchCommits = async () => {
+        try {
+          const data = await fetchAPI(`${API_BASE}/test/commits`, {
+            owner,
+            repo,
+          });
+          const commits = data.success.commits;
+          renderCommits(commits);
+        } catch (e) {
+          document.getElementById("loading").innerHTML = `Error: ${e.message}`;
+        }
+      };
+
+      const renderCommits = (commits) => {
+        const container = document.getElementById("commitsContainer");
+        document.getElementById("loading").classList.add("d-none");
+
+        // 날짜별 그룹화 (단순 리스트로 표시하되 날짜 구분)
+        // GitHub API는 최신순 정렬되어 옴
+
+        let html = '<div class="commit-group-title">Commits History</div>';
+
+        commits.forEach((commitObj) => {
+          const c = commitObj.commit;
+          const sha = commitObj.sha;
+          const author = c.author;
+          const authorImg = commitObj.author
+            ? commitObj.author.avatar_url
+            : "https://github.com/identicons/jasonlong.png"; // Fallback
+          const date = new Date(author.date).toLocaleString();
+
+          html += `
+                    <div class="timeline-item">
+                        <div class="commit-box">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <div style="font-weight:600; font-size:16px; margin-bottom:4px;">
+                                        <a href="/commit-detail?owner=${owner}&repo=${repo}&sha=${sha}" style="color:#24292f;">${
+            c.message.split("\n")[0]
+          }</a>
+                                    </div>
+                                    <div style="font-size:12px; color:#57606a;">
+                                        <img src="${authorImg}" class="avatar-small">
+                                        <strong>${
+                                          author.name
+                                        }</strong> committed on ${date}
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:8px; align-items:center;">
+                                    <span class="sha-badge">${sha.substring(
+                                      0,
+                                      7
+                                    )}</span>
+                                    <a href="/commit-detail?owner=${owner}&repo=${repo}&sha=${sha}" class="btn" style="padding: 2px 8px; font-size: 12px;">Browse</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        });
+
+        container.innerHTML = html;
+      };
+
+      renderBreadcrumb();
+      fetchCommits();
+    </script>
+  </body>
+</html>

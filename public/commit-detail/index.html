@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Commit Detail · GitHub Clone</title>
+    <base href="/" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      .commit-meta-box {
+        background-color: #f6f8fa;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 24px;
+      }
+      .diff-stat {
+        font-size: 14px;
+        color: #57606a;
+        margin-bottom: 16px;
+      }
+      .file-diff-box {
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+      .file-diff-header {
+        background-color: #f6f8fa;
+        padding: 10px 16px;
+        border-bottom: 1px solid #d0d7de;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .diff-content {
+        background-color: white;
+        padding: 16px;
+        overflow-x: auto;
+        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+          Liberation Mono, monospace;
+        font-size: 12px;
+        white-space: pre;
+      }
+      .diff-inner-wrapper {
+        min-width: 100%;
+        width: max-content;
+      }
+      /* Lines fill the wrapper */
+      .diff-added,
+      .diff-removed,
+      .diff-info {
+        display: block;
+        width: 100%;
+        padding-right: 16px;
+        box-sizing: border-box;
+      }
+      .diff-added {
+        background-color: #e6ffec;
+      }
+      .diff-removed {
+        background-color: #ffebe9;
+      }
+      .diff-info {
+        color: #57606a;
+        background-color: #f6f8fa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <a href="/home" class="header-logo">
+        <svg
+          height="32"
+          viewBox="0 0 16 16"
+          version="1.1"
+          width="32"
+          aria-hidden="true"
+          fill="white"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+          ></path>
+        </svg>
+        Commit
+      </a>
+      <div id="headerUser" class="header-user">Loading...</div>
+    </div>
+
+    <div class="container">
+      <div class="repo-header-title" style="margin-bottom: 24px">
+        <svg
+          height="24"
+          viewBox="0 0 16 16"
+          version="1.1"
+          width="24"
+          aria-hidden="true"
+          fill="#57606a"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"
+          ></path>
+        </svg>
+        <div id="breadcrumb" class="breadcrumb">Loading...</div>
+      </div>
+
+      <div style="margin-bottom: 20px">
+        <a id="codeTab" href="#" class="btn" style="margin-right: 8px">Code</a>
+        <a id="commitsTab" href="#" class="btn" style="margin-right: 8px"
+          >Commits</a
+        >
+        <span style="font-size: 14px; font-weight: bold; color: #57606a"
+          >Commit Detail</span
+        >
+      </div>
+
+      <div id="loading" class="text-center">Loading commit details...</div>
+      <div id="detailContainer" class="d-none">
+        <div class="commit-meta-box">
+          <h2
+            id="commitMsg"
+            style="margin-top: 0; font-size: 18px; font-weight: 600"
+          >
+            ...
+          </h2>
+          <div id="commitMeta" style="font-size: 13px; color: #57606a"></div>
+        </div>
+
+        <div id="diffStats" class="diff-stat"></div>
+
+        <div id="fileDiffs"></div>
+      </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+      requireAuth();
+      renderHeader();
+
+      const params = new URLSearchParams(window.location.search);
+      const owner = params.get("owner");
+      const repo = params.get("repo");
+      const sha = params.get("sha");
+
+      const codeTab = document.getElementById("codeTab");
+      if (codeTab) codeTab.href = "/repo?owner=" + owner + "&repo=" + repo;
+
+      const commitsTab = document.getElementById("commitsTab");
+      if (commitsTab)
+        commitsTab.href = "/commits?owner=" + owner + "&repo=" + repo;
+
+      const renderBreadcrumb = () => {
+        const container = document.getElementById("breadcrumb");
+        const safeOwner = owner || "unknown";
+        const safeRepo = repo || "unknown";
+        const safeSha = sha ? sha.substring(0, 7) : "...";
+
+        let html =
+          '<a href="/home" class="breadcrumb-segment">' +
+          safeOwner +
+          '</a> <span class="breadcrumb-separator">/</span> ';
+        html +=
+          '<a href="/repo?owner=' +
+          safeOwner +
+          "&repo=" +
+          safeRepo +
+          '" class="breadcrumb-segment" style="font-weight:600;">' +
+          safeRepo +
+          "</a>";
+        html +=
+          ' <span class="breadcrumb-separator">/</span> <span class="breadcrumb-segment" style="color:var(--color-fg-muted)">' +
+          safeSha +
+          "</span>";
+        container.innerHTML = html;
+      };
+
+      const fetchDetail = async () => {
+        try {
+          if (!sha) throw new Error("SHA parameter missing");
+          const data = await fetchAPI("/v1/api/github/test/commit-detail", {
+            owner,
+            repo,
+            sha,
+          });
+          const detail = data.success.detail;
+          renderDetail(detail);
+        } catch (e) {
+          document.getElementById("loading").innerHTML = "Error: " + e.message;
+        }
+      };
+
+      const renderDetail = (detail) => {
+        document.getElementById("loading").classList.add("d-none");
+        document.getElementById("detailContainer").classList.remove("d-none");
+
+        // Meta Info
+        document.getElementById("commitMsg").innerText = detail.commit.message;
+        const author = detail.commit.author;
+        const dateStr = new Date(author.date).toLocaleString();
+
+        document.getElementById("commitMeta").innerHTML =
+          "<strong>" +
+          author.name +
+          "</strong> committed on " +
+          dateStr +
+          '<span style="margin-left:10px;">SHA: ' +
+          detail.sha +
+          "</span>";
+
+        // Stats
+        const stats = detail.stats;
+        document.getElementById("diffStats").innerHTML =
+          "Showing <strong>" +
+          detail.files.length +
+          " changed files</strong> with <strong>" +
+          stats.additions +
+          " additions</strong> and <strong>" +
+          stats.deletions +
+          " deletions</strong>.";
+
+        // Files Diff
+        const diffContainer = document.getElementById("fileDiffs");
+        let html = "";
+
+        detail.files.forEach((file) => {
+          let patchHtml = "";
+          if (file.patch) {
+            const lines = file.patch.split("\n");
+            patchHtml += '<div class="diff-inner-wrapper">'; // Wrapper Start
+            lines.forEach((line) => {
+              let className = "";
+              if (line.startsWith("+")) className = "diff-added";
+              else if (line.startsWith("-")) className = "diff-removed";
+              else if (line.startsWith("@@")) className = "diff-info";
+
+              // HTML Escape
+              const safeLine = line
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+              patchHtml +=
+                '<span class="' + className + '">' + safeLine + "</span>";
+            });
+            patchHtml += "</div>"; // Wrapper End
+          } else {
+            patchHtml =
+              '<span class="diff-info">Binary file or no changes shown.</span>';
+          }
+
+          html +=
+            '<div class="file-diff-box">' +
+            '<div class="file-diff-header">' +
+            "<span>" +
+            file.filename +
+            "</span>" +
+            '<span style="font-weight:400; font-size:12px; color:#57606a;">' +
+            file.status +
+            "</span>" +
+            "</div>" +
+            '<div class="diff-content">' +
+            patchHtml +
+            "</div>" +
+            "</div>";
+        });
+
+        diffContainer.innerHTML = html;
+      };
+
+      renderBreadcrumb();
+      fetchDetail();
+    </script>
+  </body>
+</html>

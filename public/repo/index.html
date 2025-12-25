@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository · GitHub Clone</title>
+    <base href="/">
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Marked Library for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Blame Style Additions */
+        .code-line {
+            display: flex;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 12px;
+            line-height: 20px;
+        }
+        .line-num {
+            width: 50px;
+            text-align: right;
+            padding-right: 10px;
+            color: #6e7781;
+            user-select: none;
+            cursor: pointer;
+            border-right: 1px solid #eee;
+            margin-right: 10px;
+        }
+        .line-content {
+            white-space: pre;
+            flex: 1;
+            cursor: pointer;
+        }
+        .line-content:hover {
+            background-color: #f6f8fa;
+        }
+        
+        /* Blame Tooltip */
+        #blameTooltip {
+            position: absolute;
+            background: #24292f;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-width: 300px;
+        }
+        #blameTooltip a { color: #58a6ff; }
+        #blameTooltip .commit-date { color: #8b949e; margin-top: 4px; font-size: 11px; }
+
+        /* Readme Styles */
+        .readme-box {
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            margin-top: 24px;
+            overflow: hidden;
+        }
+        .readme-header {
+            background-color: #f6f8fa;
+            padding: 8px 16px;
+            border-bottom: 1px solid #d0d7de;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .markdown-body {
+            padding: 32px;
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .markdown-body h1, .markdown-body h2 { border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
+        .markdown-body img { max-width: 100%; }
+        .markdown-body pre { background-color: #f6f8fa; padding: 16px; border-radius: 6px; overflow: auto; }
+        .markdown-body code { background-color: rgba(175,184,193,0.2); padding: .2em .4em; border-radius: 6px; font-size: 85%; font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace; }
+        .markdown-body pre code { background-color: transparent; padding: 0; }
+        .markdown-body blockquote { border-left: .25em solid #d0d7de; color: #57606a; padding: 0 1em; }
+    </style>
+</head>
+<body>
+    <div id="blameTooltip"></div>
+    <div class="header">
+        <a href="/home" class="header-logo">
+            <svg height="32" viewBox="0 0 16 16" version="1.1" width="32" aria-hidden="true" fill="white">
+                <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+            </svg>
+            Repository
+        </a>
+        <div id="headerUser" class="header-user">Loading...</div>
+    </div>
+
+    <div class="container">
+        <div class="repo-header-title" style="margin-bottom: 24px;">
+            <svg height="24" viewBox="0 0 16 16" version="1.1" width="24" aria-hidden="true" fill="#57606a">
+                <path fill-rule="evenodd" d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"></path>
+            </svg>
+            <div id="breadcrumb" class="breadcrumb">Loading...</div>
+        </div>
+
+        <div style="margin-bottom: 20px; display: flex; align-items: center;">
+            <select id="branchSelect" class="btn" style="margin-right: 16px; min-width: 120px;">
+                <option>Loading...</option>
+            </select>
+            <a id="codeTab" href="#" class="btn btn-primary" style="margin-right: 8px;">Code</a>
+            <a id="commitsTab" href="#" class="btn">Commits</a>
+        </div>
+
+        <div id="loading" class="text-center">Loading files...</div>
+
+        <div id="fileBrowser" class="file-wrap d-none">
+            <div class="file-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:12px; color:#57606a;">Click a line of code to see Git Blame info.</span>
+                </div>
+            </div>
+            <table class="file-table">
+                <tbody id="fileListBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Readme Container -->
+        <div id="readmeContainer" class="readme-box d-none">
+            <div class="readme-header">
+                <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" style="vertical-align: text-bottom; margin-right: 8px;">
+                    <path fill-rule="evenodd" d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"></path>
+                </svg>
+                README.md
+            </div>
+            <div id="readmeContent" class="markdown-body"></div>
+        </div>
+
+        <div id="fileContent" class="file-wrap d-none" style="background:white; overflow-x:auto;">
+            <div id="fileCode" style="padding: 10px 0;"></div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+        requireAuth();
+        renderHeader();
+
+        const params = new URLSearchParams(window.location.search);
+        const owner = params.get('owner');
+        const repo = params.get('repo');
+        const path = params.get('path') || '';
+        const currentBranch = params.get('branch') || 'main'; // Default to main if not set
+
+        // 탭 링크 설정 (branch 포함)
+        const codeTab = document.getElementById('codeTab');
+        if (codeTab) codeTab.href = `/repo?owner=${owner}&repo=${repo}&branch=${currentBranch}`;
+        
+        const commitsTab = document.getElementById('commitsTab');
+        if (commitsTab) commitsTab.href = `/commits?owner=${owner}&repo=${repo}&branch=${currentBranch}`;
+
+        let cachedBlame = null;
+
+        const renderBreadcrumb = () => {
+            const container = document.getElementById('breadcrumb');
+            let html = `<a href="/home" class="breadcrumb-segment">${owner}</a> <span class="breadcrumb-separator">/</span> `;
+            html += `<a href="/repo?owner=${owner}&repo=${repo}&branch=${currentBranch}" class="breadcrumb-segment" style="font-weight:600;">${repo}</a>`;
+            
+            if (path) {
+                const parts = path.split('/');
+                let currentPath = '';
+                parts.forEach(part => {
+                    currentPath += (currentPath ? '/' : '') + part;
+                    html += ` <span class="breadcrumb-separator">/</span> <a href="/repo?owner=${owner}&repo=${repo}&branch=${currentBranch}&path=${currentPath}" class="breadcrumb-segment">${part}</a>`;
+                });
+            }
+            container.innerHTML = html;
+        };
+
+        const fetchBranches = async () => {
+            const select = document.getElementById('branchSelect');
+            try {
+                const data = await fetchAPI(`${API_BASE}/test/branches`, { owner, repo });
+                const branches = data.success.branches;
+                
+                select.innerHTML = branches.map(b => 
+                    `<option value="${b.name}" ${b.name === currentBranch ? 'selected' : ''}>${b.name}</option>`
+                ).join('');
+
+                select.addEventListener('change', (e) => {
+                    const newBranch = e.target.value;
+                    window.location.href = `/repo?owner=${owner}&repo=${repo}&branch=${newBranch}`;
+                });
+
+            } catch (e) {
+                select.innerHTML = `<option>${currentBranch}</option>`; 
+                console.error("Failed to fetch branches", e);
+            }
+        };
+
+        const fetchContent = async () => {
+            if (!owner || !repo) {
+                document.getElementById('loading').innerText = 'No repository specified.';
+                return;
+            }
+
+            try {
+                const data = await fetchAPI(`${API_BASE}/test/content`, { owner, repo, path, branch: currentBranch });
+                const content = data.success.content;
+
+                document.getElementById('loading').classList.add('d-none');
+
+                if (Array.isArray(content)) {
+                    renderFileList(content);
+                    // Check for README.md
+                    const readmeFile = content.find(f => f.name.toLowerCase() === 'readme.md');
+                    if (readmeFile) {
+                        fetchReadme(readmeFile.path);
+                    }
+                } else if (content.type === 'file') {
+                    renderFileView(content);
+                } else {
+                    document.getElementById('loading').innerText = 'Unknown content type.';
+                    document.getElementById('loading').classList.remove('d-none');
+                }
+
+            } catch (e) {
+                document.getElementById('loading').innerHTML = `Error: ${e.message}`;
+            }
+        };
+
+        // Fetch and Render Readme
+        const fetchReadme = async (readmePath) => {
+            try {
+                const data = await fetchAPI(`${API_BASE}/test/content`, { owner, repo, path: readmePath, branch: currentBranch });
+                const content = data.success.content;
+                
+                let decoded = "";
+                try {
+                    decoded = decodeURIComponent(escape(window.atob(content.content.replace(/\n/g, ""))));
+                } catch (e) {
+                    decoded = "Error decoding README.";
+                }
+
+                document.getElementById('readmeContainer').classList.remove('d-none');
+                document.getElementById('readmeContent').innerHTML = marked.parse(decoded);
+            } catch (e) {
+                console.error("Failed to fetch README", e);
+            }
+        };
+
+        const renderFileList = (files) => {
+            const tbody = document.getElementById('fileListBody');
+            document.getElementById('fileBrowser').classList.remove('d-none');
+            
+            let html = '';
+            if (path) {
+                const parentPath = path.substring(0, path.lastIndexOf('/'));
+                const parentLink = parentPath 
+                    ? `/repo?owner=${owner}&repo=${repo}&branch=${currentBranch}&path=${parentPath}`
+                    : `/repo?owner=${owner}&repo=${repo}&branch=${currentBranch}`;
+                
+                html += `
+                    <tr>
+                        <td class="icon-col">...</td>
+                        <td colspan="2"><a href="${parentLink}">..</a></td>
+                    </tr>
+                `;
+            }
+
+            files.sort((a, b) => {
+                if (a.type === b.type) return a.name.localeCompare(b.name);
+                return a.type === 'dir' ? -1 : 1;
+            });
+
+            files.forEach(file => {
+                const isDir = file.type === 'dir';
+                const icon = isDir 
+                    ? '<svg aria-label="Directory" height="16" viewBox="0 0 16 16" version="1.1" width="16" fill="#54aeff"><path d="M1.75 1A1.75 1.75 0 000 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25v-8.5A1.75 1.75 0 0014.25 3H7.5a.25.25 0 01-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75z"></path></svg>'
+                    : '<svg aria-label="File" height="16" viewBox="0 0 16 16" version="1.1" width="16" fill="#57606a"><path fill-rule="evenodd" d="M3.75 1.5a.25.25 0 00-.25.25v11.5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25V6H9.75A1.75 1.75 0 018 4.25V1.5H3.75zm5.75.56v2.19c0 .138.112.25.25.25h2.19L9.5 2.06zM2 1.75C2 .784 2.784 0 3.75 0h6.871c.464 0 .909.184 1.237.513l2.629 2.629c.329.328.513.773.513 1.237v9.871C15 15.216 14.216 16 13.25 16H3.75A1.75 1.75 0 012 14.25V1.75z"></path></svg>';
+                
+                const link = `/repo?owner=${owner}&repo=${repo}&branch=${currentBranch}&path=${file.path}`;
+
+                html += `
+                    <tr>
+                        <td class="icon-col">${icon}</td>
+                        <td><a href="${link}" style="color: ${isDir ? 'var(--color-fg-default)' : ''}">${file.name}</a></td>
+                        <td style="color: #57606a; font-size: 12px; text-align: right;">-</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        };
+
+        const renderFileView = (file) => {
+            const contentDiv = document.getElementById('fileContent');
+            const codeBlock = document.getElementById('fileCode');
+            contentDiv.classList.remove('d-none');
+            
+            let decoded = "";
+            try {
+                decoded = decodeURIComponent(escape(window.atob(file.content.replace(/\n/g, ""))));
+            } catch (e) {
+                decoded = "Error decoding file content.";
+            }
+
+            const lines = decoded.split('\n');
+            let html = '';
+            lines.forEach((line, index) => {
+                const lineNum = index + 1;
+                const safeLine = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+                html += `
+                    <div class="code-line" onclick="showBlame(${lineNum}, event)">
+                        <div class="line-num">${lineNum}</div>
+                        <div class="line-content">${safeLine}</div>
+                    </div>
+                `;
+            });
+            codeBlock.innerHTML = html;
+        };
+
+        const showBlame = async (lineNum, event) => {
+            const tooltip = document.getElementById('blameTooltip');
+            
+            tooltip.style.display = 'block';
+            tooltip.style.left = event.pageX + 10 + 'px';
+            tooltip.style.top = event.pageY + 'px';
+            tooltip.innerHTML = 'Loading blame...';
+
+            try {
+                if (!cachedBlame) {
+                    const data = await fetchAPI(`${API_BASE}/test/blame`, { owner, repo, path, branch: currentBranch });
+                    cachedBlame = data.success.blame;
+                }
+
+                const blame = cachedBlame.find(b => lineNum >= b.startingLine && lineNum <= b.endingLine);
+
+                if (blame) {
+                    const commit = blame.commit;
+                    tooltip.innerHTML = `
+                        <div style="font-weight:bold;">${commit.author.name}</div>
+                        <div>${commit.message}</div>
+                        <div class="commit-date">${new Date(commit.committedDate).toLocaleString()}</div>
+                    `;
+                } else {
+                    tooltip.innerHTML = 'No blame info for this line.';
+                }
+            } catch (e) {
+                tooltip.innerHTML = `Error: ${e.message}`;
+            }
+        };
+
+        window.addEventListener('click', (e) => {
+            const tooltip = document.getElementById('blameTooltip');
+            if (tooltip.style.display === 'block' && !e.target.closest('.code-line')) {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        fetchBranches();
+        renderBreadcrumb();
+        fetchContent();
+    </script>
+</body>
+</html>
