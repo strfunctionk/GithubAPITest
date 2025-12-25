@@ -1,4 +1,5 @@
 import axios from "axios";
+
 export const githubClient = async (endpoint, token, options = {}) => {
   const { method = "GET", data, params } = options;
   const url = endpoint.startsWith("http")
@@ -28,4 +29,16 @@ export const githubClient = async (endpoint, token, options = {}) => {
     );
     throw error;
   }
+};
+
+export const getRepoContext = (req) => {
+  const { owner, repo, branch } = req.query;
+  const repos = req.repos || [];
+  const selectedRepo = repos.length > 1 ? repos[1] : repos[0];
+
+  return {
+    owner: owner || selectedRepo?.owner?.login || req.user?.login,
+    repo: repo || selectedRepo?.name,
+    branch: branch || selectedRepo?.default_branch || "main",
+  };
 };

@@ -98,3 +98,123 @@ export const getGitHubGrass = async (accessToken, userName, year) => {
   });
   return grass;
 };
+
+/*
+  GitHub 저장소의 특정 파일에 대한 Blame(수정 기록) 정보를 가져옵니다.
+  @param {string} accessToken - GitHub 액세스 토큰
+  @param {string} owner - 저장소 소유자 이름
+  @param {string} repo - 저장소 이름
+  @param {string} path - 파일 경로 (예: "src/index.js")
+  @param {string} branch - 브랜치 이름 (기본값: "main")
+  @returns {Promise<Object>} - Blame 데이터 (라인 범위별 커밋 정보)
+*/
+export const getRepoFileBlame = async (
+  accessToken,
+  owner,
+  repo,
+  path,
+  branch = "main"
+) => {
+  const query = `
+    query($owner: String!, $repo: String!, $branch: String!, $path: String!) {
+      repository(owner: $owner, name: $repo) {
+        ref(qualifiedName: $branch) {
+          target {
+            ... on Commit {
+              blame(path: $path) {
+                ranges {
+                  startingLine
+                  endingLine
+                  commit {
+                    oid
+                    message
+                    committedDate
+                    author {
+                      name
+                      avatarUrl
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    owner,
+    repo,
+    branch,
+    path,
+  };
+
+  const response = await githubClient("/graphql", accessToken, {
+    method: "POST",
+    data: {
+      query,
+      variables,
+    },
+  });
+
+  if (response.errors) {
+    console.error("GitHub GraphQL Errors:", response.errors);
+    const errorDetails = JSON.stringify(response.errors, null, 2);
+    throw new Error(`GitHub GraphQL Error:\n${errorDetails}`);
+  }
+
+  const repoData = response.data?.repository;
+  if (!repoData) {
+    throw new Error(`Repository not found or access denied: ${owner}/${repo}.`);
+  }
+
+  const refData = repoData.ref;
+  if (!refData) {
+    throw new Error(`Branch not found: ${branch}`);
+  }
+
+  const blameData = refData.target?.blame;
+  if (!blameData) {
+    throw new Error(`No blame data found for file: ${path}`);
+  }
+
+  return blameData.ranges || [];
+};
+
+/*
+  GitHub 저장소의 전체 커밋 내역을 가져옵니다.
+  @param {string} accessToken - GitHub 액세스 토큰
+  @param {string} owner - 저장소 소유자 이름
+  @param {string} repo - 저장소 이름
+  @param {Object} params - 필터 옵션 (sha, path, author, since, until 등)
+  @returns {Promise<Array>} - 커밋 객체 배열
+*/
+export const getRepoCommits = async (accessToken, owner, repo, params = {}) => {
+  const queryParams = new URLSearchParams(params).toString();
+  const url = `/repos/${owner}/${repo}/commits${
+    queryParams ? `?${queryParams}` : ""
+  }`;
+
+  const commits = await githubClient(url, accessToken, {
+    method: "GET",
+  });
+
+  return commits;
+};
+
+/*
+  특정 커밋의 상세 정보(변경 사항, 통계 등)를 가져옵니다.
+  @param {string} accessToken - GitHub 액세스 토큰
+  @param {string} owner - 저장소 소유자 이름
+  @param {string} repo - 저장소 이름
+  @param {string} commitSha - 커밋 SHA
+  @returns {Promise<Object>} - 커밋 상세 객체 (stats, files 포함)
+*/
+export const getCommitDetail = async (accessToken, owner, repo, commitSha) => {
+  const url = `/repos/${owner}/${repo}/commits/${commitSha}`;
+  const commitDetail = await githubClient(url, accessToken, {
+    method: "GET",
+  });
+  return commitDetail;
+};

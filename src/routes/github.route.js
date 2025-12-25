@@ -11,6 +11,9 @@ import {
   handleGetRepoTree,
   handleGetRepoContent,
   handleGetGitHubGrass,
+  handleGetRepoCommits,
+  handleGetRepoBlame,
+  handleGetCommitDetail,
 } from "../controllers/github.controller.js";
 const route = express.Router();
 
@@ -30,6 +33,30 @@ route.get(
 );
 
 route.get("/test/grass", getAccessToken, githubUserData, handleGetGitHubGrass);
+
+route.get(
+  "/test/blame",
+  getAccessToken,
+  githubUserData,
+  githubUserRepos,
+  handleGetRepoBlame
+);
+
+route.get(
+  "/test/commits",
+  getAccessToken,
+  githubUserData,
+  githubUserRepos,
+  handleGetRepoCommits
+);
+
+route.get(
+  "/test/commit-detail",
+  getAccessToken,
+  githubUserData,
+  githubUserRepos,
+  handleGetCommitDetail
+);
 
 route.get(
   "/test/content",
