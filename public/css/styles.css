@@ -230,12 +230,71 @@ a:hover {
 }
 
 /* Utils */
-.d-none {
-  display: none !important;
+.d-none { display: none !important; }
+.text-center { text-align: center; }
+.mt-4 { margin-top: 16px; }
+
+/* Debug Data Feature */
+.debug-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #24292f;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 9999;
+  opacity: 0.8;
+  transition: opacity 0.2s;
 }
-.text-center {
-  text-align: center;
+.debug-btn:hover { opacity: 1; }
+
+.debug-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  display: none; /* Hidden by default */
 }
-.mt-4 {
-  margin-top: 16px;
+.debug-modal.active { display: flex; }
+
+.debug-content {
+  background: white;
+  width: 80%;
+  max-width: 800px;
+  height: 80%;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
 }
+
+.debug-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.debug-body {
+  flex: 1;
+  overflow: auto;
+  background: #f6f8fa;
+  padding: 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
