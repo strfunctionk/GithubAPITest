@@ -61,34 +61,115 @@
         font-family: monospace;
         color: #d73a49;
       }
-              .note { background-color: #fffbdd; border-left: 4px solid #ffeb3b; padding: 1rem; margin-top: 1rem; font-size: 0.9rem; }
-              
-              /* 잔디 그래프 스타일 */
-              .graph-container { display: flex; flex-direction: column; padding: 20px; background: #f8faff; border: 1px solid #e1e4e8; border-radius: 12px; margin-top: 1rem; }
-              .months-header { display: flex; margin-left: 0px; margin-bottom: 5px; font-size: 12px; color: #999; justify-content: space-between; padding-right: 10px; }
-              .weeks-container { display: flex; overflow-x: auto; }
-              .week { display: flex; flex-direction: column; gap: 3px; margin-right: 3px; }
-              .day { width: 12px; height: 12px; border-radius: 2px; background-color: #ebedf0; }
-              
-              /* 연도 네비게이션 스타일 */
-              .year-nav-container { display: flex; align-items: center; background: #f1f3f8; padding: 5px 15px; border-radius: 30px; }
-              .year-nav { display: flex; align-items: center; gap: 15px; font-weight: bold; font-size: 1.1rem; }
-              .nav-btn { background: #dfe4ec; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; font-weight: bold; }
-              .nav-btn:hover { background: #cfd6e0; }
-              
-              /* 기여도 색상 단계 (GitHub 스타일) */
-              .day[data-level="0"] { background-color: #ebedf0; }
-              .day[data-level="1"] { background-color: #9be9a8; }
-              .day[data-level="2"] { background-color: #40c463; }
-              .day[data-level="3"] { background-color: #30a14e; }
-              .day[data-level="4"] { background-color: #216e39; }
-              
-              .tooltip { position: absolute; background: rgba(0,0,0,0.8); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 12px; pointer-events: none; display: none; z-index: 100; }
-          </style>
-      </head>
-      <body>
-          <div id="tooltip" class="tooltip"></div>
-          <h1>DeVine GitHub Integration Test</h1>
+      .note {
+        background-color: #fffbdd;
+        border-left: 4px solid #ffeb3b;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+      }
+
+      /* 잔디 그래프 스타일 */
+      .graph-container {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background: #f8faff;
+        border: 1px solid #e1e4e8;
+        border-radius: 12px;
+        margin-top: 1rem;
+      }
+      .months-header {
+        display: flex;
+        margin-left: 0px;
+        margin-bottom: 5px;
+        font-size: 12px;
+        color: #999;
+        justify-content: space-between;
+        padding-right: 10px;
+      }
+      .weeks-container {
+        display: flex;
+        overflow-x: auto;
+      }
+      .week {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-right: 3px;
+      }
+      .day {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        background-color: #ebedf0;
+      }
+
+      /* 연도 네비게이션 스타일 */
+      .year-nav-container {
+        display: flex;
+        align-items: center;
+        background: #f1f3f8;
+        padding: 5px 15px;
+        border-radius: 30px;
+      }
+      .year-nav {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      .nav-btn {
+        background: #dfe4ec;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        font-weight: bold;
+      }
+      .nav-btn:hover {
+        background: #cfd6e0;
+      }
+
+      /* 기여도 색상 단계 (GitHub 스타일) */
+      .day[data-level="0"] {
+        background-color: #ebedf0;
+      }
+      .day[data-level="1"] {
+        background-color: #9be9a8;
+      }
+      .day[data-level="2"] {
+        background-color: #40c463;
+      }
+      .day[data-level="3"] {
+        background-color: #30a14e;
+      }
+      .day[data-level="4"] {
+        background-color: #216e39;
+      }
+
+      .tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        pointer-events: none;
+        display: none;
+        z-index: 100;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="tooltip" class="tooltip"></div>
+    <h1>DeVine GitHub Integration Test</h1>
 
     <div class="card">
       <h2>Step 1: Access Token 발급</h2>
@@ -127,32 +208,105 @@
         />
       </div>
 
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <!-- Group 1: Test Buttons -->
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button id="testUserBtn" class="btn" style="background: #0366d6;">Test User Data Only</button>
-                <button id="testBtn" class="btn btn-test">Test Full Data (User + Repos)</button>
-            </div>
-
-            <!-- Group 2: Repo Content Buttons -->
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button id="testContentBtn" class="btn" style="background: #008080;">Get Repo Content (Root)</button>
-                <button id="testTreeBtn" class="btn" style="background: #6f42c1;">Get Repo Tree</button>
-                <button id="downloadZipBtn" class="btn" style="background: #f66a0a;">Download Repo Zip</button>
-            </div>
-            
-            <!-- Group 3: GitHub Grass -->
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <div class="year-nav-container">
-                    <div class="year-nav">
-                        <button id="prevYear" class="nav-btn">&lt;</button>
-                        <span id="currentYearDisplay">2025년</span>
-                        <button id="nextYear" class="nav-btn">&gt;</button>
-                    </div>
-                </div>
-                <button id="testGrassBtn" class="btn" style="background: #2ea44f;">Get GitHub Grass</button>
-            </div>
+      <div style="display: flex; flex-direction: column; gap: 15px">
+        <!-- Group 1: Test Buttons -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button id="testUserBtn" class="btn" style="background: #0366d6">
+            Test User Data Only
+          </button>
+          <button id="testBtn" class="btn btn-test">
+            Test Full Data (User + Repos)
+          </button>
         </div>
+
+        <!-- Group 2: Repo Content Buttons -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button id="testContentBtn" class="btn" style="background: #008080">
+            Get Repo Content (Root)
+          </button>
+          <button id="testTreeBtn" class="btn" style="background: #6f42c1">
+            Get Repo Tree
+          </button>
+          <button id="downloadZipBtn" class="btn" style="background: #f66a0a">
+            Download Repo Zip
+          </button>
+        </div>
+
+        <!-- Group 3: GitHub Grass -->
+        <div
+          style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap"
+        >
+          <div class="year-nav-container">
+            <div class="year-nav">
+              <button id="prevYear" class="nav-btn">&lt;</button>
+              <span id="currentYearDisplay">2025년</span>
+              <button id="nextYear" class="nav-btn">&gt;</button>
+            </div>
+          </div>
+          <button id="testGrassBtn" class="btn" style="background: #2ea44f">
+            Get GitHub Grass
+          </button>
+        </div>
+
+        <!-- Group 4: Commits -->
+        <div
+          style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap"
+        >
+          <input
+            type="text"
+            id="commitAuthorInput"
+            placeholder="Author (Optional)"
+            style="padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px"
+          />
+          <button id="testCommitsBtn" class="btn" style="background: #dbab09">
+            Get Repo Commits
+          </button>
+        </div>
+
+        <!-- Group 5: Commit Detail -->
+        <div
+          style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap"
+        >
+          <input
+            type="text"
+            id="commitShaInput"
+            placeholder="Commit SHA"
+            style="
+              padding: 0.6rem;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              min-width: 250px;
+            "
+          />
+          <button
+            id="testCommitDetailBtn"
+            class="btn"
+            style="background: #6f42c1"
+          >
+            Get Commit Detail
+          </button>
+        </div>
+
+        <!-- Group 6: Blame -->
+        <div
+          style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap"
+        >
+          <input
+            type="text"
+            id="blamePathInput"
+            placeholder="File Path (e.g. package.json)"
+            style="
+              padding: 0.6rem;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              min-width: 250px;
+            "
+          />
+          <button id="testBlameBtn" class="btn" style="background: #d73a49">
+            Get File Blame
+          </button>
+        </div>
+      </div>
 
       <div id="resultArea" style="margin-top: 1.5rem"></div>
     </div>
