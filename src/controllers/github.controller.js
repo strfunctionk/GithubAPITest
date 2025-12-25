@@ -92,16 +92,21 @@ export const handleGetRepoCommits = async (req, res) => {
 
 export const handleGetRepoContent = async (req, res) => {
   const { owner, repo } = getRepoContext(req);
-  const content = await getRepoContent(req.accessToken, owner, repo, "");
+  const { path } = req.query;
+  const content = await getRepoContent(
+    req.accessToken,
+    owner,
+    repo,
+    path || ""
+  );
 
-  return res
-    .status(StatusCodes.OK)
-    .success({
-      message: "Repository Content Data (Root)",
-      owner,
-      repo,
-      content,
-    });
+  return res.status(StatusCodes.OK).success({
+    message: "Repository Content Data",
+    owner,
+    repo,
+    path: path || "",
+    content,
+  });
 };
 
 export const handleGetRepoTree = async (req, res) => {
