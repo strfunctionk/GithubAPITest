@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 상세 분석 리포트</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/report.css">
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>AI가 코드를 분석하고 리포트를 생성 중입니다...</p>
+        <p style="font-size: 14px; color: #666;">(프로젝트 규모에 따라 1-2분 정도 소요될 수 있습니다)</p>
+    </div>
+
+    <div class="container">
+        <!-- 분석 요청 폼 -->
+        <div class="analysis-form" id="analysisFormContainer">
+            <h2><i class="fas fa-robot"></i> AI 코드 분석 리포트 생성</h2>
+            <form id="analysisForm">
+                <div class="form-group">
+                    <label for="repoUrl">GitHub 레포지토리 URL</label>
+                    <input type="url" id="repoUrl" class="form-control" placeholder="https://github.com/username/repo" required>
+                </div>
+                <div class="form-group">
+                    <label for="authorName">작성자 이름 (Git ID 또는 Name)</label>
+                    <input type="text" id="authorName" class="form-control" placeholder="예: Hong Gildong" required>
+                </div>
+                <div class="form-group">
+                    <label for="authorEmail">작성자 이메일 (선택사항, 동명이인 구분용)</label>
+                    <input type="email" id="authorEmail" class="form-control" placeholder="user@example.com">
+                </div>
+                <button type="submit" class="btn-primary">리포트 생성하기</button>
+            </form>
+        </div>
+
+        <!-- 리포트 출력 영역 -->
+        <div id="reportPaper" class="report-paper">
+            <!-- 1. 헤더 -->
+            <div class="report-header">
+                <div id="reportTitle" class="report-title">프로젝트 상세 분석 리포트</div>
+                <div id="reportDate" class="report-date"></div>
+            </div>
+
+            <!-- 2. 프로젝트 개요 -->
+            <div class="report-section">
+                <div class="section-title"><i class="fas fa-briefcase"></i> 프로젝트 개요</div>
+                
+                <div class="subsection-title">프로젝트 목적</div>
+                <p id="projectGoal"></p>
+
+                <div class="subsection-title">핵심 기술 스택</div>
+                <table class="info-table">
+                    <tbody id="techStackBody"></tbody>
+                </table>
+
+                <div class="subsection-title">프로젝트 규모</div>
+                <table class="info-table">
+                    <tbody id="scaleBody"></tbody>
+                </table>
+            </div>
+
+            <!-- 3. 구현 기능 상세 -->
+            <div class="report-section">
+                <div class="section-title"><i class="fas fa-search"></i> 구현 기능 상세 분석</div>
+                <div id="featuresContainer"></div>
+            </div>
+
+            <!-- 4. 프로젝트 분석 요약 -->
+            <div class="report-section">
+                <div class="section-title"><i class="fas fa-chart-pie"></i> 프로젝트 분석 요약</div>
+                
+                <div class="summary-box implemented">
+                    <span class="summary-title">이 프로젝트에서 구현한 것</span>
+                    <ul id="myContributions" class="check-list"></ul>
+                </div>
+
+                <div class="summary-box not-implemented">
+                    <span class="summary-title">이 프로젝트에서 구현하지 않은 것</span>
+                    <ul id="othersContributions" class="cross-list"></ul>
+                </div>
+            </div>
+
+            <!-- 5. 코드 분석 인사이트 -->
+            <div class="report-section">
+                <div class="section-title"><i class="fas fa-lightbulb"></i> 코드 분석 인사이트</div>
+                <div id="insightsContainer"></div>
+            </div>
+
+            <!-- 6. 개선 가능한 영역 -->
+            <div class="report-section">
+                <div class="section-title"><i class="fas fa-wrench"></i> 개선 가능한 영역</div>
+                <div id="improvementsContainer"></div>
+            </div>
+
+            <!-- 7. 다음 프로젝트 추천 -->
+            <div class="report-section">
+                <div class="section-title"><i class="fas fa-rocket"></i> 다음 프로젝트에서 시도해볼 만한 것</div>
+                <div id="recommendationsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/report.js"></script>
+</body>
+</html>
