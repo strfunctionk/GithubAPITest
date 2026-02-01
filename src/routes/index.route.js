@@ -1,7 +1,7 @@
 import express from "express";
 // import aiRoute from "./ai.route.js";
 // import authRoute from "./auth.route.js";
-// import oauthRoute from "./oauth.route.js";
+import oauthRoute from "./oauth.route.js";
 // import githubRoute from "./github.route.js";
 //import userRoute from "./user.route.js";
 import gitRoute from "./git.route.js";
@@ -10,7 +10,7 @@ const router = express.Router();
 
 //router.use("/ai", aiRoute);
 //router.use("/auth", authRoute);
-//router.use("/oauth", oauthRoute);
+router.use("/oauth", oauthRoute);
 //router.use("/github", githubRoute);
 router.use("/git", gitRoute);
 //router.use("/user", userRoute);

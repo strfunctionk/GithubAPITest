@@ -3,9 +3,16 @@ import http from "isomorphic-git/http/node";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { genaiContributionReport, genaiDetailedContributionReport, genaiAnalyzeArchitecture } from "../utils/genai.util.js";
+import {
+  genaiContributionReport,
+  genaiDetailedContributionReport,
+  genaiAnalyzeArchitecture,
+} from "../utils/genai.util.js";
 import { InvalidRequestError, NotFoundError } from "../errors/auth.error.js";
-import { GitHubAuthError, GitHubRepoNotFoundError } from "../errors/github.error.js";
+import {
+  GitHubAuthError,
+  GitHubRepoNotFoundError,
+} from "../errors/github.error.js";
 import {
   getTrackedFiles,
   detectCodeExtensions,
@@ -77,14 +84,19 @@ export const cloneRepository = async (repoUrl, depth = null) => {
   } catch (error) {
     fs.rmSync(tempDir, { recursive: true, force: true });
 
-    if (error.message.includes("Authentication") || error.message.includes("401")) {
+    if (
+      error.message.includes("Authentication") ||
+      error.message.includes("401")
+    ) {
       throw new GitHubAuthError(
         "GitHub authentication failed. Please check GITHUB_BEARER_TOKEN",
       );
     }
 
     if (error.message.includes("not found") || error.message.includes("404")) {
-      throw new GitHubRepoNotFoundError("Repository not found or access denied");
+      throw new GitHubRepoNotFoundError(
+        "Repository not found or access denied",
+      );
     }
 
     throw error;
@@ -241,7 +253,11 @@ export const getFileDiff = async (dir, commitHash1, commitHash2, filePath) => {
  * @param {boolean} [includeDiff] - diff 포함 여부 (기본 false)
  * @returns {Promise<Object>} - 파일별 수정 이력
  */
-export const analyzeFileHistory = async (dir, authorEmail = null, includeDiff = false) => {
+export const analyzeFileHistory = async (
+  dir,
+  authorEmail = null,
+  includeDiff = false,
+) => {
   const commits = await getCommitHistory(dir, authorEmail);
   const fileHistory = {};
 
@@ -420,7 +436,11 @@ export const cleanupDirectory = (dir) => {
  * @param {number|null} [depth] - 클론 깊이 (null이면 전체 히스토리)
  * @returns {Promise<Object>} - 분석 결과
  */
-export const analyzeRepository = async (repoUrl, authorEmail = null, depth = null) => {
+export const analyzeRepository = async (
+  repoUrl,
+  authorEmail = null,
+  depth = null,
+) => {
   let tempDir = null;
 
   try {
@@ -514,7 +534,12 @@ export const generateContributionReport = async (
  * @param {number|null} [depth] - 클론 깊이 (null이면 전체 히스토리)
  * @returns {Promise<Object>} - AI 분석 결과
  */
-export const analyzeContributorWithAI = async (repoUrl, authorName, authorEmail = null, depth = null) => {
+export const analyzeContributorWithAI = async (
+  repoUrl,
+  authorName,
+  authorEmail = null,
+  depth = null,
+) => {
   if (!authorName) {
     throw new InvalidRequestError("authorName is required");
   }
@@ -532,11 +557,16 @@ export const analyzeContributorWithAI = async (repoUrl, authorName, authorEmail 
     const fileHistory = await analyzeFileHistory(tempDir, authorEmail, true);
 
     // 기여자의 코드 변경 정보 수집
-    const contributorChanges = collectContributorChanges(fileHistory, authorName);
+    const contributorChanges = collectContributorChanges(
+      fileHistory,
+      authorName,
+    );
 
     if (Object.keys(contributorChanges.files).length === 0) {
       cleanupDirectory(tempDir);
-      throw new NotFoundError(`"${authorName}"의 기여 내역을 찾을 수 없습니다.`);
+      throw new NotFoundError(
+        `"${authorName}"의 기여 내역을 찾을 수 없습니다.`,
+      );
     }
 
     // AI 분석 리포트 생성
@@ -615,7 +645,11 @@ export const detectTechStack = async (dir) => {
     try {
       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
       for (const entry of entries) {
-        if (entry.name.startsWith(".") || entry.name === "node_modules" || entry.name === "vendor") {
+        if (
+          entry.name.startsWith(".") ||
+          entry.name === "node_modules" ||
+          entry.name === "vendor"
+        ) {
           continue;
         }
         const fullPath = path.join(dirPath, entry.name);
@@ -624,7 +658,8 @@ export const detectTechStack = async (dir) => {
         } else {
           const ext = path.extname(entry.name).toLowerCase();
           if (extensionToLanguage[ext]) {
-            languageCounts[extensionToLanguage[ext]] = (languageCounts[extensionToLanguage[ext]] || 0) + 1;
+            languageCounts[extensionToLanguage[ext]] =
+              (languageCounts[extensionToLanguage[ext]] || 0) + 1;
           }
         }
       }
@@ -649,53 +684,53 @@ export const detectTechStack = async (dir) => {
       };
 
       const frameworkMap = {
-        "next": "Next.js",
-        "react": "React",
-        "vue": "Vue.js",
-        "nuxt": "Nuxt.js",
-        "express": "Express.js",
-        "fastify": "Fastify",
-        "koa": "Koa",
-        "nestjs": "NestJS",
+        next: "Next.js",
+        react: "React",
+        vue: "Vue.js",
+        nuxt: "Nuxt.js",
+        express: "Express.js",
+        fastify: "Fastify",
+        koa: "Koa",
+        nestjs: "NestJS",
         "@nestjs/core": "NestJS",
-        "angular": "Angular",
+        angular: "Angular",
         "@angular/core": "Angular",
-        "svelte": "Svelte",
-        "gatsby": "Gatsby",
-        "remix": "Remix",
-        "electron": "Electron",
+        svelte: "Svelte",
+        gatsby: "Gatsby",
+        remix: "Remix",
+        electron: "Electron",
       };
 
       const libraryMap = {
-        "axios": "Axios",
-        "lodash": "Lodash",
-        "moment": "Moment.js",
-        "dayjs": "Day.js",
-        "redux": "Redux",
-        "zustand": "Zustand",
-        "recoil": "Recoil",
-        "prisma": "Prisma",
+        axios: "Axios",
+        lodash: "Lodash",
+        moment: "Moment.js",
+        dayjs: "Day.js",
+        redux: "Redux",
+        zustand: "Zustand",
+        recoil: "Recoil",
+        prisma: "Prisma",
         "@prisma/client": "Prisma",
-        "mongoose": "Mongoose",
-        "sequelize": "Sequelize",
-        "typeorm": "TypeORM",
-        "tailwindcss": "Tailwind CSS",
+        mongoose: "Mongoose",
+        sequelize: "Sequelize",
+        typeorm: "TypeORM",
+        tailwindcss: "Tailwind CSS",
         "styled-components": "Styled Components",
         "@emotion/react": "Emotion",
-        "jest": "Jest",
-        "mocha": "Mocha",
-        "vitest": "Vitest",
-        "cypress": "Cypress",
-        "playwright": "Playwright",
+        jest: "Jest",
+        mocha: "Mocha",
+        vitest: "Vitest",
+        cypress: "Cypress",
+        playwright: "Playwright",
       };
 
       const dbMap = {
-        "pg": "PostgreSQL",
-        "mysql": "MySQL",
-        "mysql2": "MySQL",
-        "mongodb": "MongoDB",
-        "redis": "Redis",
-        "sqlite3": "SQLite",
+        pg: "PostgreSQL",
+        mysql: "MySQL",
+        mysql2: "MySQL",
+        mongodb: "MongoDB",
+        redis: "Redis",
+        sqlite3: "SQLite",
         "better-sqlite3": "SQLite",
       };
 
@@ -721,19 +756,19 @@ export const detectTechStack = async (dir) => {
     try {
       const content = fs.readFileSync(requirementsPath, "utf-8");
       const pythonFrameworks = {
-        "django": "Django",
-        "flask": "Flask",
-        "fastapi": "FastAPI",
-        "tornado": "Tornado",
-        "pyramid": "Pyramid",
+        django: "Django",
+        flask: "Flask",
+        fastapi: "FastAPI",
+        tornado: "Tornado",
+        pyramid: "Pyramid",
       };
       const pythonLibs = {
-        "pandas": "Pandas",
-        "numpy": "NumPy",
-        "tensorflow": "TensorFlow",
-        "pytorch": "PyTorch",
+        pandas: "Pandas",
+        numpy: "NumPy",
+        tensorflow: "TensorFlow",
+        pytorch: "PyTorch",
         "scikit-learn": "Scikit-learn",
-        "sqlalchemy": "SQLAlchemy",
+        sqlalchemy: "SQLAlchemy",
       };
 
       const lines = content.toLowerCase().split("\n");
@@ -752,7 +787,10 @@ export const detectTechStack = async (dir) => {
   }
 
   // Docker, CI/CD 도구 감지
-  if (fs.existsSync(path.join(dir, "Dockerfile")) || fs.existsSync(path.join(dir, "docker-compose.yml"))) {
+  if (
+    fs.existsSync(path.join(dir, "Dockerfile")) ||
+    fs.existsSync(path.join(dir, "docker-compose.yml"))
+  ) {
     techStack.tools.push("Docker");
   }
   if (fs.existsSync(path.join(dir, ".github/workflows"))) {
@@ -782,9 +820,13 @@ export const detectTechStack = async (dir) => {
  * @param {Array<string>} [codeExtensions] - 코드 파일 확장자 목록 (없으면 자동 감지)
  * @returns {Promise<Object>} - 프로젝트 규모 정보
  */
-export const analyzeProjectScale = async (dir, commits, codeExtensions = null) => {
+export const analyzeProjectScale = async (
+  dir,
+  commits,
+  codeExtensions = null,
+) => {
   // 코드 확장자가 제공되지 않으면 AI로 감지
-  const extensions = codeExtensions || await detectCodeExtensions(dir);
+  const extensions = codeExtensions || (await detectCodeExtensions(dir));
 
   let totalLines = 0;
   let totalFiles = 0;
@@ -795,8 +837,12 @@ export const analyzeProjectScale = async (dir, commits, codeExtensions = null) =
 
   for (const file of trackedFiles) {
     // 불필요한 디렉토리 제외
-    if (file.includes("node_modules/") || file.includes("vendor/") ||
-        file.includes("dist/") || file.includes("build/")) {
+    if (
+      file.includes("node_modules/") ||
+      file.includes("vendor/") ||
+      file.includes("dist/") ||
+      file.includes("build/")
+    ) {
       continue;
     }
 
@@ -818,9 +864,12 @@ export const analyzeProjectScale = async (dir, commits, codeExtensions = null) =
   // 개발 기간 계산
   let developmentPeriod = null;
   if (commits.length > 0) {
-    const oldestTimestamp = commits[commits.length - 1]?.commit.author.timestamp * 1000;
+    const oldestTimestamp =
+      commits[commits.length - 1]?.commit.author.timestamp * 1000;
     const newestTimestamp = commits[0]?.commit.author.timestamp * 1000;
-    const diffDays = Math.ceil((newestTimestamp - oldestTimestamp) / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil(
+      (newestTimestamp - oldestTimestamp) / (1000 * 60 * 60 * 24),
+    );
     developmentPeriod = {
       startDate: new Date(oldestTimestamp).toISOString().split("T")[0],
       endDate: new Date(newestTimestamp).toISOString().split("T")[0],
@@ -849,7 +898,12 @@ export const analyzeArchitecture = async (dir) => {
   try {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     directories = entries
-      .filter((e) => e.isDirectory() && !e.name.startsWith(".") && e.name !== "node_modules")
+      .filter(
+        (e) =>
+          e.isDirectory() &&
+          !e.name.startsWith(".") &&
+          e.name !== "node_modules",
+      )
       .map((e) => e.name);
   } catch (error) {
     // 디렉토리 읽기 오류 무시
@@ -952,7 +1006,12 @@ export const classifyContributions = (fileHistory, targetAuthor) => {
  * @param {number|null} [depth] - 클론 깊이 (null이면 전체 히스토리)
  * @returns {Promise<Object>} - 상세 AI 분석 결과
  */
-export const generateDetailedContributionReport = async (repoUrl, authorName, authorEmail = null, depth = null) => {
+export const generateDetailedContributionReport = async (
+  repoUrl,
+  authorName,
+  authorEmail = null,
+  depth = null,
+) => {
   if (!authorName) {
     throw new InvalidRequestError("authorName is required");
   }
@@ -992,11 +1051,16 @@ export const generateDetailedContributionReport = async (repoUrl, authorName, au
 
     if (Object.keys(myContributions.files).length === 0) {
       cleanupDirectory(tempDir);
-      throw new NotFoundError(`"${authorName}"의 기여 내역을 찾을 수 없습니다.`);
+      throw new NotFoundError(
+        `"${authorName}"의 기여 내역을 찾을 수 없습니다.`,
+      );
     }
 
     // 기여자의 코드 변경 정보 수집 (상세)
-    const contributorChanges = collectContributorChanges(allFileHistory, authorName);
+    const contributorChanges = collectContributorChanges(
+      allFileHistory,
+      authorName,
+    );
 
     // AI 상세 분석 리포트 생성
     const aiReport = await genaiDetailedContributionReport({

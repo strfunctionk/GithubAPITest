@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const data = await response.json();
+      console.log('Backend Response Data:', data);
 
       if (data.resultType === 'SUCCESS') {
         renderReport(data.success.report);
